@@ -250,7 +250,7 @@ public class GameCanvasFrame extends JFrame {
             }
         } else {
             scoreDisplayer.setText("分数：" + SCORE_COUNTER.get());
-            scoreDisplayer.setForeground(Color.getColor("#BBB"));
+            scoreDisplayer.setForeground(new Color(0xBBB));
         }
         if (failureSummary) {
             if (SCORE_COUNTER.get() < 0) {
