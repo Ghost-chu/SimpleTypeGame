@@ -1,0 +1,69 @@
+JFDML JFormDesigner: "8.0.0.0.194" Java: "17.0.5" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+			name: "this"
+			"$sizePolicy": 1
+			"title": "游戏 UI "
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "scoreDisplayer"
+				"text": "计分器"
+				"horizontalAlignment": 4
+				"font": new java.awt.Font( "Microsoft YaHei UI", 0, 14 )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 533
+				"y": 5
+				"width": 222
+				"height": 34
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "radioButton1"
+				"text": "继续"
+				"$buttonGroup": &FormReference0 new FormReference( "controllerButtons" )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 315
+				"y": 10
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "radioButton2"
+				"text": "暂停"
+				"$buttonGroup": #FormReference0
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"width": 50
+				"height": 21
+				"x": 365
+				"y": 10
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "radioButton3"
+				"text": "停止并结算"
+				"$buttonGroup": #FormReference0
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"width": 85
+				"height": 21
+				"x": 415
+				"y": 10
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label1"
+				"text": "计时器"
+				"font": new java.awt.Font( "Microsoft YaHei UI", 0, 14 )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 12
+				"y": 8
+				"height": 29
+				"width": 275
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 780, 515 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "controllerButtons"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 520 )
+		} )
+	}
+}
