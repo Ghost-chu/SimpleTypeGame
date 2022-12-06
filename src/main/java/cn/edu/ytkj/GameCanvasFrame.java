@@ -42,6 +42,7 @@ public class GameCanvasFrame extends JFrame {
     private final GameMainFrame gameMainFrame;
     private final boolean blindMode;
     private final boolean focusMode;
+    private AtomicInteger missCounter = new AtomicInteger(0);
     private boolean stopped = false;
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel scoreDisplayer;
@@ -235,12 +236,21 @@ public class GameCanvasFrame extends JFrame {
             addCombo();
         } else {
             breakCombo();
+            missCounter.incrementAndGet();
         }
         if (isInCombo()) {
             SCORE_COUNTER.addAndGet(5);
             scoreDisplayer.setText("分数：" + SCORE_COUNTER.get() + " (COMBO x" + COMBO_COUNTER.get() + ")");
+            if (missCounter.get() == 0) {
+                scoreDisplayer.setForeground(new Color(0xFFD700));
+            } else if (missCounter.get() == 1) {
+                scoreDisplayer.setForeground(Color.CYAN);
+            } else {
+                scoreDisplayer.setForeground(new Color(0xBBB));
+            }
         } else {
             scoreDisplayer.setText("分数：" + SCORE_COUNTER.get());
+            scoreDisplayer.setForeground(Color.getColor("#BBB"));
         }
         if (failureSummary) {
             if (SCORE_COUNTER.get() < 0) {
