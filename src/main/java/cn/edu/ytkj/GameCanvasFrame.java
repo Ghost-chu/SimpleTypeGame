@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Test
  */
 public class GameCanvasFrame extends JFrame {
-    private static final AtomicInteger SCORE_COUNTER = new AtomicInteger(0);
+    private final AtomicInteger SCORE_COUNTER = new AtomicInteger(0);
     private static final Random RANDOM = new Random();
     private final int speed;
     private final boolean redown;
