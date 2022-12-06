@@ -72,25 +72,25 @@ public class GameCanvasFrame extends JFrame {
                 this.speed = 4000;
                 break;
             case "非常慢":
-                this.speed = 3000;
-                break;
-            case "慢":
                 this.speed = 2000;
                 break;
-            case "正常":
+            case "慢":
                 this.speed = 1000;
+                break;
+            case "正常":
+                this.speed = 800;
                 break;
             case "快":
                 this.speed = 500;
                 break;
             case "非常快":
-                this.speed = 100;
+                this.speed = 300;
                 break;
             case "★中国★":
-                this.speed = 50;
+                this.speed = 150;
                 break;
             default:
-                this.speed = 100;
+                this.speed = 50;
                 break;
         }
         initComponents();
@@ -193,6 +193,8 @@ public class GameCanvasFrame extends JFrame {
                     }
 
                 }
+                // 重新绘制一次
+                timedRepeatTask();
             }
 
             @Override

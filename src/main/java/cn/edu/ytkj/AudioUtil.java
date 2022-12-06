@@ -1,6 +1,7 @@
 package cn.edu.ytkj;
 
 import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -36,16 +37,18 @@ public class AudioUtil {
      * @param fileName 文件名，放在项目 resources 文件夹下，会自动添加 / 前缀
      */
     public static void register(String fileName) {
-        try (InputStream stream = AudioUtil.class.getResourceAsStream("/" + fileName)) {
-            if (stream == null)
+        try (InputStream s = AudioUtil.class.getResourceAsStream("/" + fileName)) {
+            if (s == null)
                 throw new IllegalArgumentException("需要注册的文件没有放置在 resources 文件夹下或者没有打包到 JAR 中!");
+            BufferedInputStream bf = new BufferedInputStream(s);
             Clip clip = AudioSystem.getClip();
             // 使用 getAudioFormat 强制使用指定的位深度和波特率，避免出现流格式不兼容错误
-            clip.open(AudioSystem.getAudioInputStream(getAudioFormat(), AudioSystem.getAudioInputStream(stream)));
+            clip.open(AudioSystem.getAudioInputStream(getAudioFormat(), AudioSystem.getAudioInputStream(bf)));
             audioMap.put(fileName, clip);
             System.out.println("Audio " + fileName + " registered!");
         } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
             e.printStackTrace();
+        } finally {
         }
     }
 

@@ -18,7 +18,7 @@ public class Bootstrap {
         // 加载 FlatDarculaLaf 配色
         FlatDarculaLaf.setup();
         // 检查硬件加速未启用导致的闪烁
-        if (!System.getProperty("sun.java2d.opengl").equalsIgnoreCase("true")) {
+        if (!"true".equalsIgnoreCase(System.getProperty("sun.java2d.opengl"))) {
             JOptionPane.showMessageDialog(null, "不启用硬件加速将会导致 Canvas 画布在绘制字母时出现闪烁问题，请转到 DEBUG 选项卡打勾 `java2d.opengl` 并重启应用程序以使硬件加速生效。", "硬件加速未启用", JOptionPane.WARNING_MESSAGE);
         }
         // 初始化主界面
