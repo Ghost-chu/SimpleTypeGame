@@ -3,6 +3,7 @@ package cn.edu.ytkj;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 游戏画布
@@ -13,37 +14,72 @@ public class GameCanvas extends Canvas {
      * 此队列中的所有对象每次绘制时都会被绘制到画布上
      */
     private final List<GameObject> livingGameObject = Collections.synchronizedList(new ArrayList<>());
+    private final ReentrantLock LOCK = new ReentrantLock();
     /*
      * 随机数生成器
      */
     private final Random random = new Random();
+    /*
+    字符重新下落
+     */
     private final boolean redown;
+    private final boolean focusMode;
+    private final boolean blindMode;
 
-    public GameCanvas(boolean redown) {
+    /**
+     * 构造 GameCanvas 游戏主画布
+     *
+     * @param redown    字符是否会重新下落
+     * @param focusMode 聚焦模式
+     * @param blindMode 抓瞎模式
+     */
+    public GameCanvas(boolean redown, boolean focusMode, boolean blindMode) {
         this.redown = redown;
+        this.focusMode = focusMode;
+        this.blindMode = blindMode;
     }
 
+    /**
+     * 绘制游戏画布
+     *
+     * @param g the specified Graphics context
+     */
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         /*
          * 将渲染队列中的所有内容绘制到画布上
          */
-        livingGameObject.forEach(obj -> {
-            // 设定颜色
-            g.setColor(obj.getColor());
-            // 绘制文本
+        LOCK.lock();
+        try {
+            livingGameObject.forEach(obj -> {
+                // 设定颜色
+                g.setColor(obj.getColor());
+                // 绘制文本
+                // 如果此对象是渲染队列中最靠下的对象，则应用文字放大效果，突出显示
+                Optional<GameObject> op = getYLowestObject();
+                if (op.isPresent() && op.get() == obj) {
+                    if (focusMode) {
+                        g.setFont(new Font("微软雅黑", Font.BOLD, 28));
+                    } else {
+                        g.setFont(new Font("微软雅黑", Font.BOLD, 15));
+                    }
 
-            // 如果此对象是渲染队列中最靠下的对象，则应用文字放大效果，突出显示
-            Optional<GameObject> op = getYLowestObject();
-            if (op.isPresent() && op.get() == obj) {
-                g.setFont(new Font("微软雅黑", Font.BOLD, 28));
-            } else {
-                g.setFont(new Font("微软雅黑", Font.BOLD, 15));
-            }
-            // 绘制文字
-            g.drawString(obj.getString(), obj.getX(), obj.getY());
-        });
+                } else {
+                    g.setFont(new Font("微软雅黑", Font.BOLD, 15));
+                }
+                // 绘制文字
+                if (blindMode && obj.getY() > this.getHeight() / 1.8) {
+                    g.drawString("?", obj.getX(), obj.getY());
+                } else {
+                    g.drawString(obj.getString(), obj.getX(), obj.getY());
+                }
+
+            });
+        } finally {
+            LOCK.unlock();
+        }
+
     }
 
     /**
@@ -68,14 +104,19 @@ public class GameCanvas extends Canvas {
         // 更新新设置的 Y 值
         obj.setY(targetY);
         // 插入渲染队列
-        this.livingGameObject.add(obj);
+        LOCK.lock();
+        try {
+            this.livingGameObject.add(obj);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     /**
      * 获取当前渲染队列的 GameObjects
      * 该方法会返回引用而非克隆，修改会反映到 livingGameObject 中
      *
-     * @return GameObjects
+     * @return GameObjects 渲染队列
      */
     public List<GameObject> getGameObjects() {
         return livingGameObject;
@@ -90,19 +131,24 @@ public class GameCanvas extends Canvas {
     public boolean moveDown(int distance) {
         boolean anyDeleted = false;
         // 使用迭代器来循环中删除操作
-        Iterator<GameObject> gameObjectIterator = livingGameObject.iterator();
-        while (gameObjectIterator.hasNext()) {
-            GameObject gameObject = gameObjectIterator.next();
-            gameObject.setY(gameObject.getY() + distance);
-            // 如果 GameObject 超出画布，则应用重新下落效果或者将其移除
-            if (gameObject.getY() > this.getHeight()) {
-                if (redown) {
-                    gameObject.setY(-5);
-                } else {
-                    gameObjectIterator.remove();
-                    anyDeleted = true;
+        LOCK.lock();
+        try {
+            Iterator<GameObject> gameObjectIterator = livingGameObject.listIterator();
+            while (gameObjectIterator.hasNext()) {
+                GameObject gameObject = gameObjectIterator.next();
+                gameObject.setY(gameObject.getY() + distance);
+                // 如果 GameObject 超出画布，则应用重新下落效果或者将其移除
+                if (gameObject.getY() > this.getHeight()) {
+                    if (redown) {
+                        gameObject.setY(-5);
+                    } else {
+                        gameObjectIterator.remove();
+                        anyDeleted = true;
+                    }
                 }
             }
+        } finally {
+            LOCK.unlock();
         }
         this.repaint();
         return anyDeleted;
@@ -115,18 +161,23 @@ public class GameCanvas extends Canvas {
      */
     public Optional<GameObject> getYLowestObject() {
         GameObject lowestObject = null;
-        for (GameObject gameObject : livingGameObject) {
-            if (lowestObject == null) {
+        LOCK.lock();
+        try {
+            for (GameObject gameObject : livingGameObject) {
+                if (lowestObject == null) {
+                    lowestObject = gameObject;
+                    continue;
+                }
+                // check Y
+                if (lowestObject.getY() >= gameObject.getY()) {
+                    continue;
+                }
                 lowestObject = gameObject;
-                continue;
             }
-            // check Y
-            if (lowestObject.getY() >= gameObject.getY()) {
-                continue;
-            }
-            lowestObject = gameObject;
+            return Optional.ofNullable(lowestObject);
+        } finally {
+            LOCK.unlock();
         }
-        return Optional.ofNullable(lowestObject);
     }
 
     /**
@@ -136,18 +187,23 @@ public class GameCanvas extends Canvas {
      */
     public Optional<GameObject> getYHighestObject() {
         GameObject highestObject = null;
-        for (GameObject gameObject : livingGameObject) {
-            if (highestObject == null) {
+        LOCK.lock();
+        try {
+            for (GameObject gameObject : livingGameObject) {
+                if (highestObject == null) {
+                    highestObject = gameObject;
+                    continue;
+                }
+                // check Y
+                if (highestObject.getY() <= gameObject.getY()) {
+                    continue;
+                }
                 highestObject = gameObject;
-                continue;
             }
-            // check Y
-            if (highestObject.getY() <= gameObject.getY()) {
-                continue;
-            }
-            highestObject = gameObject;
+            return Optional.ofNullable(highestObject);
+        } finally {
+            LOCK.unlock();
         }
-        return Optional.ofNullable(highestObject);
     }
 
     /**
@@ -159,13 +215,19 @@ public class GameCanvas extends Canvas {
      * 无论如何，响应后，Y轴最低的 GameObject 总会被从渲染队列中移除，并进行分数操作
      */
     public Optional<Boolean> keyPressed(String str) {
-        Optional<GameObject> obj = getYLowestObject();
-        if (!obj.isPresent()) {
-            return Optional.empty();
+        LOCK.lock();
+        try {
+            Optional<GameObject> obj = getYLowestObject();
+            if (!obj.isPresent()) {
+                return Optional.empty();
+            }
+            GameObject gameObject = obj.get();
+            Optional<Boolean> hit = Optional.of(gameObject.getString().toLowerCase(Locale.ROOT).equals(str.toLowerCase(Locale.ROOT)));
+            this.livingGameObject.remove(gameObject);
+            return hit;
+        } finally {
+            LOCK.unlock();
         }
-        GameObject gameObject = obj.get();
-        Optional<Boolean> hit = Optional.of(gameObject.getString().toLowerCase(Locale.ROOT).equals(str.toLowerCase(Locale.ROOT)));
-        this.livingGameObject.remove(gameObject);
-        return hit;
+
     }
 }

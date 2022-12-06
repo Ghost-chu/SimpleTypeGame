@@ -40,6 +40,8 @@ public class GameCanvasFrame extends JFrame {
     private final AtomicInteger TIMER_ATOMIC = new AtomicInteger(0);
     private final AtomicInteger COMBO_COUNTER = new AtomicInteger(0);
     private final GameMainFrame gameMainFrame;
+    private final boolean blindMode;
+    private final boolean focusMode;
     private boolean stopped = false;
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel scoreDisplayer;
@@ -51,7 +53,8 @@ public class GameCanvasFrame extends JFrame {
     private GameCanvas panel1;
 
     public GameCanvasFrame(String speed, boolean redown, boolean randColor, boolean hitPunish,
-                           boolean combo, String username, int maxLength, int perPunishScore, boolean failureSummary, GameMainFrame gameMainFrame) {
+                           boolean combo, String username, int maxLength, int perPunishScore, boolean failureSummary,
+                           GameMainFrame gameMainFrame, boolean focusMode, boolean blindMode) {
         this.redown = redown;
         this.randColor = randColor;
         this.hitPunish = hitPunish;
@@ -60,6 +63,8 @@ public class GameCanvasFrame extends JFrame {
         this.maxLength = maxLength;
         this.perPunishScore = perPunishScore;
         this.failureSummary = failureSummary;
+        this.focusMode = focusMode;
+        this.blindMode = blindMode;
         this.gameMainFrame = gameMainFrame;
         this.gameMainFrame.setVisible(false);
         switch (speed) {
@@ -79,10 +84,10 @@ public class GameCanvasFrame extends JFrame {
                 this.speed = 500;
                 break;
             case "非常快":
-                this.speed = 200;
+                this.speed = 100;
                 break;
             case "★中国★":
-                this.speed = 100;
+                this.speed = 50;
                 break;
             default:
                 this.speed = 100;
@@ -125,7 +130,7 @@ public class GameCanvasFrame extends JFrame {
 
             }
         });
-        this.panel1 = new GameCanvas(redown);
+        this.panel1 = new GameCanvas(redown, focusMode, blindMode);
         this.add(panel1);
         initTimers();
         initCanvas();
@@ -140,7 +145,7 @@ public class GameCanvasFrame extends JFrame {
      * @return 随机 Swing 组件颜色
      */
     private static Color generateColor() {
-        Color[] colors = new Color[]{Color.BLACK, Color.BLUE, Color.RED, Color.MAGENTA, Color.ORANGE};
+        Color[] colors = new Color[]{Color.WHITE, Color.BLUE, Color.RED, Color.MAGENTA, Color.ORANGE, Color.CYAN, Color.GREEN, Color.YELLOW};
         return colors[RANDOM.nextInt(colors.length)];
     }
 
@@ -244,8 +249,6 @@ public class GameCanvasFrame extends JFrame {
 
     private void startGame() {
         radioButton1.setSelected(true);
-        //radioButton2.setSelected(false);
-        //radioButton3.setSelected(false);
     }
 
     private void initTimers() {
@@ -279,9 +282,10 @@ public class GameCanvasFrame extends JFrame {
         panel1.requestFocusInWindow();
         if (panel1.getGameObjects().size() < maxLength) {
             // x 和 y 在注册到渲染队列后会被重新赋值，且 Y 会持续增加
-            panel1.insertNewGameObject(new GameObject(randColor ? generateColor() : Color.BLACK, generateChar(), -1, -1));
+            panel1.insertNewGameObject(new GameObject(randColor ? generateColor() : Color.WHITE, generateChar(), -1, -1));
         }
         if (panel1.moveDown(10)) {
+            AudioUtil.playClick();
             SCORE_COUNTER.addAndGet(-perPunishScore);
             updateScores(false);
         }
@@ -334,7 +338,7 @@ public class GameCanvasFrame extends JFrame {
         //---- radioButton1 ----
         radioButton1.setText("\u7ee7\u7eed");
         contentPane.add(radioButton1);
-        radioButton1.setBounds(new Rectangle(new Point(315, 10), radioButton1.getPreferredSize()));
+        radioButton1.setBounds(315, 10, 47, radioButton1.getPreferredSize().height);
 
         //---- radioButton2 ----
         radioButton2.setText("\u6682\u505c");
