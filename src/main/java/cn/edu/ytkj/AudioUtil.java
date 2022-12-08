@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * 音频工具
  *
- * @author Wang YiFei
+ * @author 魏传烁
  */
 public class AudioUtil {
     /*
@@ -37,28 +37,41 @@ public class AudioUtil {
      * @param fileName 文件名，放在项目 resources 文件夹下，会自动添加 / 前缀
      */
     public static void register(String fileName) {
+        // 获取类本身，从类加载器中打开一个指定资源输入流
         try (InputStream s = AudioUtil.class.getResourceAsStream("/" + fileName)) {
+            // 检查流存不存在
             if (s == null)
                 throw new IllegalArgumentException("需要注册的文件没有放置在 resources 文件夹下或者没有打包到 JAR 中!");
+            // 转换为 BufferedInputStream，确保 Clip 对象可以正确创建
             BufferedInputStream bf = new BufferedInputStream(s);
+            // 创建音频片段对象
             Clip clip = AudioSystem.getClip();
-            // 使用 getAudioFormat 强制使用指定的位深度和波特率，避免出现流格式不兼容错误
+            // 把输入流转换为音频输入流，并以指定的音频格式打开
             clip.open(AudioSystem.getAudioInputStream(getAudioFormat(), AudioSystem.getAudioInputStream(bf)));
             audioMap.put(fileName, clip);
             System.out.println("Audio " + fileName + " registered!");
         } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
             e.printStackTrace();
-        } finally {
         }
     }
 
     public static void play(String fileName) {
+        // 以文件名在注册表中查询clip对象
         Clip clip = audioMap.get(fileName);
+        // 如果没找到，报错
         if (clip == null) throw new IllegalArgumentException("Audio " + fileName + " not registered!");
+        // 将游标移动到最头部的位置
         clip.setFramePosition(0);
+        // 开始播放
         clip.start();
     }
 
+    /**
+     * 提供指定音频格式
+     * 从网上复制的
+     *
+     * @return 音频格式类
+     */
     private static AudioFormat getAudioFormat() {
         float sampleRate = 44100;
         //8000,11025,16000,22050,44100

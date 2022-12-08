@@ -61,7 +61,6 @@ public class GameMainFrame extends JFrame {
     private JCheckBox dbg_awt_nativedoublebuffering;
     private JCheckBox dbg_java2d_noddraw;
     private JCheckBox dbg_java2d_ddscale;
-
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
     public GameMainFrame() {
         initComponents();
@@ -101,6 +100,7 @@ public class GameMainFrame extends JFrame {
                 throw new RuntimeException(e);
             }
         });
+        // DEBUG 代码段 开始
         this.dbg_testexception.addActionListener((v) -> {
             Thread thread = new Thread(() -> {
                 throw new RuntimeException("DEBUG - 测试异常");
@@ -165,6 +165,7 @@ public class GameMainFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "保存配置文件失败: " + e.getMessage(), "无法保存配置文件", JOptionPane.ERROR_MESSAGE);
             }
         }));
+        // DEBUG 代码段 结束
     }
 
     /**
@@ -182,17 +183,6 @@ public class GameMainFrame extends JFrame {
         this.maxChars.setText(String.valueOf(ConfigUtil.get().node("max-chars").getInt(6)));
         this.blindMode.setSelected(ConfigUtil.get().node("blind-mode").getBoolean(false));
         this.focusMode.setSelected(ConfigUtil.get().node("focus-mode").getBoolean(true));
-        this.dbg_swing_aatext.setSelected(Boolean.parseBoolean(System.getProperty("swing.aatext")));
-        this.dbg_awt_nativedoublebuffering.setSelected(Boolean.parseBoolean(System.getProperty("awt.nativeDoubleBuffering")));
-        this.dbg_java2d_ddscale.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.ddscale")));
-        this.dbg_java2d_opengl.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.opengl")));
-        this.dbg_java2d_d3d.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.d3d")));
-        this.dbg_java2d_noddraw.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.noddraw")));
-        if (dbg_java2d_opengl.isSelected()) {
-            dbg_java2d_opengl.setForeground(Color.GREEN);
-        } else {
-            dbg_java2d_opengl.setForeground(Color.RED);
-        }
         flushRanks();
     }
 
