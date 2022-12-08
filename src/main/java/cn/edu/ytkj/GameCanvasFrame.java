@@ -26,9 +26,7 @@ public class GameCanvasFrame extends JFrame {
     private final AtomicInteger SCORE_COUNTER = new AtomicInteger(0);
     private static final Random RANDOM = new Random();
     private final int speed;
-    private final boolean redown;
     private final boolean randColor;
-    private final boolean hitPunish;
     private final boolean combo;
     private final String username;
     private final int maxLength;
@@ -40,23 +38,21 @@ public class GameCanvasFrame extends JFrame {
     private final AtomicInteger TIMER_ATOMIC = new AtomicInteger(0);
     private final AtomicInteger COMBO_COUNTER = new AtomicInteger(0);
     private final GameMainFrame gameMainFrame;
-    private final boolean blindMode;
-    private final boolean focusMode;
-    private AtomicInteger missCounter = new AtomicInteger(0);
-    private boolean stopped = false;
+    private final AtomicInteger MISS_COUNTER = new AtomicInteger(0);
+    private final boolean hitPunish;
+    // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
+    private final GameCanvas GAME_CANVAS;
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel scoreDisplayer;
     private JRadioButton radioButton1;
     private JRadioButton radioButton2;
     private JRadioButton radioButton3;
     private JLabel label1;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
-    private GameCanvas panel1;
+    private boolean STOPPED = false;
 
     public GameCanvasFrame(String speed, boolean redown, boolean randColor, boolean hitPunish,
                            boolean combo, String username, int maxLength, int perPunishScore, boolean failureSummary,
                            GameMainFrame gameMainFrame, boolean focusMode, boolean blindMode) {
-        this.redown = redown;
         this.randColor = randColor;
         this.hitPunish = hitPunish;
         this.combo = combo;
@@ -64,8 +60,6 @@ public class GameCanvasFrame extends JFrame {
         this.maxLength = maxLength;
         this.perPunishScore = perPunishScore;
         this.failureSummary = failureSummary;
-        this.focusMode = focusMode;
-        this.blindMode = blindMode;
         this.gameMainFrame = gameMainFrame;
         this.gameMainFrame.setVisible(false);
         switch (speed) {
@@ -131,8 +125,8 @@ public class GameCanvasFrame extends JFrame {
 
             }
         });
-        this.panel1 = new GameCanvas(redown, focusMode, blindMode);
-        this.add(panel1);
+        this.GAME_CANVAS = new GameCanvas(redown, focusMode, blindMode);
+        this.add(GAME_CANVAS);
         initTimers();
         initCanvas();
         registerListeners();
@@ -163,11 +157,11 @@ public class GameCanvasFrame extends JFrame {
     }
 
     private void initCanvas() {
-        panel1.setBounds(0, 40, this.getWidth(), this.getHeight() - 40);
+        GAME_CANVAS.setBounds(0, 40, this.getWidth(), this.getHeight() - 40);
     }
 
     private void registerListeners() {
-        panel1.addKeyListener(new KeyListener() {
+        GAME_CANVAS.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
 
@@ -183,14 +177,16 @@ public class GameCanvasFrame extends JFrame {
                 } else {
                     AudioUtil.playClick();
                 }
-                Optional<Boolean> result = panel1.keyPressed(String.valueOf(e.getKeyChar()));
+                Optional<Boolean> result = GAME_CANVAS.keyPressed(String.valueOf(e.getKeyChar()));
                 if (result.isPresent()) {
                     if (result.get()) {
                         SCORE_COUNTER.incrementAndGet();
                         updateScores(true);
                     } else {
-                        SCORE_COUNTER.addAndGet(-perPunishScore);
-                        updateScores(false);
+                        if (hitPunish) {
+                            SCORE_COUNTER.addAndGet(-perPunishScore);
+                            updateScores(false);
+                        }
                     }
 
                 }
@@ -236,14 +232,14 @@ public class GameCanvasFrame extends JFrame {
             addCombo();
         } else {
             breakCombo();
-            missCounter.incrementAndGet();
+            MISS_COUNTER.incrementAndGet();
         }
         if (isInCombo()) {
             SCORE_COUNTER.addAndGet(5);
             scoreDisplayer.setText("分数：" + SCORE_COUNTER.get() + " (COMBO x" + COMBO_COUNTER.get() + ")");
-            if (missCounter.get() == 0) {
+            if (MISS_COUNTER.get() == 0) {
                 scoreDisplayer.setForeground(new Color(0xFFD700));
-            } else if (missCounter.get() == 1) {
+            } else if (MISS_COUNTER.get() == 1) {
                 scoreDisplayer.setForeground(Color.CYAN);
             } else {
                 scoreDisplayer.setForeground(new Color(0xBBB));
@@ -291,12 +287,12 @@ public class GameCanvasFrame extends JFrame {
         if (!radioButton1.isSelected()) {
             return;
         }
-        panel1.requestFocusInWindow();
-        if (panel1.getGameObjects().size() < maxLength) {
+        GAME_CANVAS.requestFocusInWindow();
+        if (GAME_CANVAS.getGameObjects().size() < maxLength) {
             // x 和 y 在注册到渲染队列后会被重新赋值，且 Y 会持续增加
-            panel1.insertNewGameObject(new GameObject(randColor ? generateColor() : Color.WHITE, generateChar(), -1, -1));
+            GAME_CANVAS.insertNewGameObject(new GameObject(randColor ? generateColor() : Color.WHITE, generateChar(), -1, -1));
         }
-        if (panel1.moveDown(10)) {
+        if (GAME_CANVAS.moveDown(10)) {
             AudioUtil.playClick();
             SCORE_COUNTER.addAndGet(-perPunishScore);
             updateScores(false);
@@ -304,8 +300,8 @@ public class GameCanvasFrame extends JFrame {
     }
 
     private void endGame() {
-        if (stopped) return;
-        stopped = true;
+        if (STOPPED) return;
+        STOPPED = true;
         AudioUtil.playGameEnd();
         DRAW_TIMER.cancel();
         TIME_TIMER.cancel();
