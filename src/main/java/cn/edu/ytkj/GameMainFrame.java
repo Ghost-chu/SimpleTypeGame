@@ -183,6 +183,17 @@ public class GameMainFrame extends JFrame {
         this.maxChars.setText(String.valueOf(ConfigUtil.get().node("max-chars").getInt(6)));
         this.blindMode.setSelected(ConfigUtil.get().node("blind-mode").getBoolean(false));
         this.focusMode.setSelected(ConfigUtil.get().node("focus-mode").getBoolean(true));
+        this.dbg_swing_aatext.setSelected(Boolean.parseBoolean(System.getProperty("swing.aatext")));
+        this.dbg_awt_nativedoublebuffering.setSelected(Boolean.parseBoolean(System.getProperty("awt.nativeDoubleBuffering")));
+        this.dbg_java2d_ddscale.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.ddscale")));
+        this.dbg_java2d_opengl.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.opengl")));
+        this.dbg_java2d_d3d.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.d3d")));
+        this.dbg_java2d_noddraw.setSelected(Boolean.parseBoolean(System.getProperty("sun.java2d.noddraw")));
+        if (dbg_java2d_opengl.isSelected()) {
+            dbg_java2d_opengl.setForeground(Color.GREEN);
+        } else {
+            dbg_java2d_opengl.setForeground(Color.RED);
+        }
         flushRanks();
     }
 

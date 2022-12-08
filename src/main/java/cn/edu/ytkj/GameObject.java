@@ -4,6 +4,8 @@ import java.awt.*;
 
 /**
  * 游戏对象 （下落字）
+ *
+ * @author 李响
  */
 public class GameObject {
     // 对象颜色

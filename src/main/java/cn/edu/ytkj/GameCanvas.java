@@ -178,20 +178,26 @@ public class GameCanvas extends Canvas {
      * 获取最低 Y 轴的 GameObject
      *
      * @return 返回一个 GameObject，如果渲染队列没有合适的 GameObject，则返回 null
+     * @author 李响
      */
     public Optional<GameObject> getYLowestObject() {
         GameObject lowestObject = null;
+        // 上锁，防止线程安全问题导致的程序崩溃
         LOCK.lock();
         try {
+            // 循环渲染队列内的所有 GameObject
             for (GameObject gameObject : livingGameObject) {
+                // 如果上一个匹配对象不存在，那么将上一个匹配对象设置为当前对象，并跳过本次循环
                 if (lowestObject == null) {
                     lowestObject = gameObject;
                     continue;
                 }
-                // check Y
+                // Y 值检查，
                 if (lowestObject.getY() >= gameObject.getY()) {
+                    // 跳过本次循环
                     continue;
                 }
+                // 上一个匹配对象设置为当前对象
                 lowestObject = gameObject;
             }
             return Optional.ofNullable(lowestObject);
@@ -204,6 +210,7 @@ public class GameCanvas extends Canvas {
      * 获取最高 Y 轴的 GameObject
      *
      * @return 返回一个 GameObject，如果渲染队列没有合适的 GameObject，则返回 null
+     * @author 李响
      */
     public Optional<GameObject> getYHighestObject() {
         GameObject highestObject = null;
