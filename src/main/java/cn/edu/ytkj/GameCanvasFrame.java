@@ -172,6 +172,9 @@ public class GameCanvasFrame extends JFrame {
                 if (!radioButton1.isSelected()) {
                     return;
                 }
+                if (!((e.getKeyChar() >= 'A' && e.getKeyChar() <= 'Z') || (e.getKeyChar() >= 'a' && e.getKeyChar() <= 'z'))) {
+                    return;
+                }
                 if (isInCombo()) {
                     AudioUtil.playComboClick();
                 } else {
