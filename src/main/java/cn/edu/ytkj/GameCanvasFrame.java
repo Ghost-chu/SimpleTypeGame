@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Test
  */
 public class GameCanvasFrame extends JFrame {
-    private final AtomicInteger SCORE_COUNTER = new AtomicInteger(0);
     private static final Random RANDOM = new Random();
+    private final AtomicInteger SCORE_COUNTER = new AtomicInteger(0);
     private final int speed;
     private final boolean randColor;
     private final boolean combo;
@@ -197,7 +197,6 @@ public class GameCanvasFrame extends JFrame {
                     }
 
                 }
-                // 重新绘制一次
                 timedRepeatTask();
             }
 
@@ -282,7 +281,6 @@ public class GameCanvasFrame extends JFrame {
     }
 
     private void bumpTime() {
-        // radioButton1 如果被选中，那么游戏即在运行
         if (!radioButton1.isSelected()) {
             return;
         }
@@ -296,7 +294,6 @@ public class GameCanvasFrame extends JFrame {
         }
         GAME_CANVAS.requestFocusInWindow();
         if (GAME_CANVAS.getGameObjects().size() < maxLength) {
-            // x 和 y 在注册到渲染队列后会被重新赋值，且 Y 会持续增加
             GAME_CANVAS.insertNewGameObject(new GameObject(randColor ? generateColor() : Color.WHITE, generateChar(), -1, -1));
         }
         if (GAME_CANVAS.moveDown(10)) {
@@ -312,31 +309,28 @@ public class GameCanvasFrame extends JFrame {
      * @author 王明扬
      */
     private void endGame() {
-        if (STOPPED) return; // 检查是否已经停止 防止重复调用
+        if (STOPPED) return;
         STOPPED = true;
-        AudioUtil.playGameEnd(); // 播放游戏结束音效
-        DRAW_TIMER.cancel(); // 停止渲染
-        TIME_TIMER.cancel(); // 停止计时
-        radioButton1.setSelected(false); // 让继续按钮不被选中
-        radioButton2.setSelected(false); // 让暂停按钮不被选中
-        radioButton3.setSelected(true); // 让停止并结算按钮选中
-        JOptionPane.showMessageDialog(this, "游戏结束，你的分数是：" + SCORE_COUNTER.get()); // 弹出信息框
-        /*
-         * 更新排行榜信息
-         */
+        AudioUtil.playGameEnd();
+        DRAW_TIMER.cancel();
+        TIME_TIMER.cancel();
+        radioButton1.setSelected(false);
+        radioButton2.setSelected(false);
+        radioButton3.setSelected(true);
+        JOptionPane.showMessageDialog(this, "游戏结束，你的分数是：" + SCORE_COUNTER.get());
         try {
-            // 获取配置文件，选择 score-history 节点，选择以 username 变量内容为名的节点
+
             ConfigurationNode node = ConfigUtil.get().node("score-history").node(username);
-            if (node.isNull() || node.getInt() < SCORE_COUNTER.get()) { // 检查节点是否存在，并检查已存在节点中的值大小是否小于计分器
-                node.set(SCORE_COUNTER.get()); // 更新值
+            if (node.isNull() || node.getInt() < SCORE_COUNTER.get()) {
+                node.set(SCORE_COUNTER.get());
             }
-            ConfigUtil.saveConfig(); // 保存配置文件
+            ConfigUtil.saveConfig();
         } catch (SerializationException e) {
             throw new RuntimeException(e);
         }
-        this.dispose(); // 销毁游戏窗口 （关闭）
-        gameMainFrame.setVisible(true); // 重新展示游戏主窗口
-        gameMainFrame.flushRanks(); // 更新排行榜
+        this.dispose();
+        gameMainFrame.setVisible(true);
+        gameMainFrame.flushRanks();
     }
 
     private void initComponents() {

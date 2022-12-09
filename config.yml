@@ -1,0 +1,14 @@
+badHitPunish: true
+speedSelector: ★中国★
+combo: true
+name: lixiang
+text-redown: false
+text-randomcolor: true
+negative-failure: true
+bad-hit-punish: 1
+max-chars: 8
+blind-mode: true
+focus-mode: true
+jvm-extra: { opengl: true, aatext: false, java2dd3d: false, nativeDoubleBuffering: false,
+             java2dnoddraw: false, java2dddscale: false }
+score-history: { 游客: 0, 游客123: 41, 小明: 23, 小王: 11, 小强: 8, 张三: 128, 李四: 64, 王五: 8, lixiang: 29 }

@@ -61,6 +61,7 @@ public class GameMainFrame extends JFrame {
     private JCheckBox dbg_awt_nativedoublebuffering;
     private JCheckBox dbg_java2d_noddraw;
     private JCheckBox dbg_java2d_ddscale;
+
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
     public GameMainFrame() {
         initComponents();
@@ -71,9 +72,7 @@ public class GameMainFrame extends JFrame {
      * 初始化默认值
      */
     private void initDefaultValues() {
-        // 设置窗体关闭默认选项
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // 添加选择项
         this.speedSelector.addItem("有手就行");
         this.speedSelector.addItem("非常慢");
         this.speedSelector.addItem("慢");
@@ -81,10 +80,8 @@ public class GameMainFrame extends JFrame {
         this.speedSelector.addItem("快");
         this.speedSelector.addItem("非常快");
         this.speedSelector.addItem("★中国★");
-        // 从配置文件加载默认值
         loadConf();
         this.startGame.addActionListener((v) -> {
-            // 保存配置
             try {
                 saveConf();
                 Object selectedItem = speedSelector.getSelectedItem();

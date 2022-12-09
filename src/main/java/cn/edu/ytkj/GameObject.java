@@ -8,13 +8,9 @@ import java.awt.*;
  * @author 李响
  */
 public class GameObject {
-    // 对象颜色
     private Color color;
-    // 对象文本
     private String string;
-    // 当前 X 坐标
     private int x;
-    // 当前 Y 坐标
     private int y;
 
     /**
