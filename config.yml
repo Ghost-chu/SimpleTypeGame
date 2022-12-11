@@ -1,0 +1,15 @@
+badHitPunish: true
+speedSelector: 非常快
+combo: true
+name: 演示
+text-redown: false
+text-randomcolor: true
+negative-failure: false
+bad-hit-punish: 100
+max-chars: 3
+blind-mode: true
+focus-mode: true
+jvm-extra: { opengl: true, aatext: false, java2dd3d: false, nativeDoubleBuffering: false,
+             java2dnoddraw: false, java2dddscale: false }
+score-history: { 游客: 0, 游客123: 41, 小明: 23, 小王: 11, 小强: 8, 张三: 128, 李四: 64, 王五: 8, lixiang: 53,
+                 演示: 26 }
